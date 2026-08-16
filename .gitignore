@@ -1,0 +1,22 @@
+# Build output
+build/
+out/
+
+
+# vcpkg
+vcpkg_installed/
+compile_commands.json
+
+# JetBrains (CLion/Rider)
+.idea/
+
+# VS Code (keep launch.json, ignore machine-local settings)
+.vscode/*
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+
+# Misc caches
+.cache/

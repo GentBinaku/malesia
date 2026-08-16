@@ -1,0 +1,13 @@
+{
+  "dependencies": [
+    "glfw3",
+    "glm",
+    "stb",
+    "tinyobjloader",
+    "vulkan-sdk-components",
+    "vulkan-validationlayers",
+    "vulkan-tools",
+    "vulkan-headers",
+    "vulkan-utility-libraries"
+  ]
+}
