@@ -1,15 +1,13 @@
 add_library(input SHARED)
-
-target_sources(window PRIVATE
-    src/input.cpp
+target_sources(input
+    PUBLIC
+    FILE_SET modules TYPE CXX_MODULES
+    BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
+    FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/input_module.cppm"
 )
 
-target_link_libraries(window PUBLIC
+target_link_libraries(input PUBLIC
     glfw
-    glm::glm
-    glad::glad
-    OpenGL::GL
 )
-
-target_include_directories(input PUBLIC include)
 
