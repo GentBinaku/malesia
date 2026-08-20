@@ -37,6 +37,9 @@ namespace window
             throw std::runtime_error("failed to load OpenGL functions");
         }
         glfwSwapInterval(1);
+
+        glfwSetWindowUserPointer(_window.get(), this);
+        glfwSetKeyCallback(_window.get(), &Window::handleKeyEvent);
     }
 
     Window::~Window()
@@ -63,6 +66,20 @@ namespace window
     auto Window::handle() const -> GLFWwindow*
     {
         return _window.get();
+    }
+
+    auto Window::setKeyCallback(KeyCallback callback) -> void
+    {
+        _keyCallback = std::move(callback);
+    }
+
+    auto Window::handleKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods) -> void
+    {
+        auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+        if (self && self->_keyCallback)
+        {
+            self->_keyCallback(key, scancode, action, mods);
+        }
     }
 }
 }
