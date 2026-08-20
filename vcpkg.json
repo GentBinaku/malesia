@@ -3,11 +3,13 @@
     "glfw3",
     "glm",
     "stb",
+    "opengl-registry",
     "tinyobjloader",
-    "vulkan-sdk-components",
-    "vulkan-validationlayers",
-    "vulkan-tools",
-    "vulkan-headers",
-    "vulkan-utility-libraries"
+    {
+      "name": "glad",
+      "features": [
+        "gl-api-latest"
+      ]
+    }
   ]
 }

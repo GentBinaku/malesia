@@ -1,18 +1,20 @@
-#include <print>
-#include <stop_token>
 #include "window/window.hpp"
 
-auto mainLoop() -> void
+auto mainLoop(malesia::window::Window& window) -> void
 {
-	std::stop_token stoken = std::stop_token();
-
-	while (!stoken.stop_requested())
+	while (!window.shouldClose())
 	{
-		glfwPollEvents();
+		window.pollEvents();
+
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		window.swapBuffers();
 	}
 }
 
 auto main() -> int {
-	mainLoop();
+	malesia::window::Window window(800, 600);
+	mainLoop(window);
 	return 0;
 }

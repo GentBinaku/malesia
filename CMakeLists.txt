@@ -2,7 +2,7 @@
 # and include sub-projects here.
 cmake_minimum_required (VERSION 4.00)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_TOOLCHAIN_FILE "C:/Users/gbinaku/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE INTERNAL "" FORCE)
+set(CMAKE_TOOLCHAIN_FILE "/home/gbinaku/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE INTERNAL "" FORCE)
 
 project(Malesia LANGUAGES CXX)
 
@@ -16,7 +16,8 @@ execute_process(
             ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
 
-find_package(Vulkan REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 
