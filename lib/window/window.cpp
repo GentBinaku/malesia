@@ -1,9 +1,5 @@
-//
-// Created by gbinaku on 8/16/2026.
-//
+module;
 
-#ifndef MALESIA_WINDOWS_HPP
-#define MALESIA_WINDOWS_HPP
 // clang-format off
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -12,7 +8,9 @@
 #include <memory>
 // clang-format on
 
-namespace malesia {
+export module malesia.window;
+
+export namespace malesia {
 namespace window {
 class Window {
 public:
@@ -45,4 +43,3 @@ private:
 };
 } // namespace window
 } // namespace malesia
-#endif // MALESIA_WINDOWS_HPP

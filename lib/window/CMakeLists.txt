@@ -1,7 +1,13 @@
 add_library(window SHARED)
 
-target_sources(window PRIVATE
-    src/window.cpp
+target_sources(window
+    PUBLIC
+    FILE_SET modules TYPE CXX_MODULES
+    BASE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}"
+    FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/window.cpp"
+    PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/window_impl.cpp"
 )
 
 target_link_libraries(window PUBLIC
@@ -10,6 +16,4 @@ target_link_libraries(window PUBLIC
     glad::glad
     OpenGL::GL
 )
-
-target_include_directories(window PUBLIC include)
 

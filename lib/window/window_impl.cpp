@@ -1,8 +1,12 @@
-//
-// Created by gbinaku on 8/16/2026.
-//
+module;
+
+// clang-format off
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <stdexcept>
-#include <window/window.hpp>
+// clang-format on
+
+module malesia.window;
 
 namespace malesia {
 namespace window {
@@ -60,7 +64,7 @@ auto Window::setKeyCallback(KeyCallback callback) -> void {
 auto Window::handleKeyEvent(GLFWwindow *window, int key, int scancode,
                             int action, int mods) -> void {
   auto *self = static_cast<Window *>(glfwGetWindowUserPointer(window));
-  if (self && !self->_keyCallback) {
+  if (self && self->_keyCallback) {
     self->_keyCallback(key, scancode, action, mods);
   }
 }

@@ -7,23 +7,15 @@ tasks:
   configure:
     desc: Configure the CMake build (Ninja is required for C++ module support)
     cmds:
-      - |
-        if [ -f {{.BUILD_DIR}}/CMakeCache.txt ] && ! grep -q '^CMAKE_GENERATOR:INTERNAL=Ninja$' {{.BUILD_DIR}}/CMakeCache.txt; then
-          rm -rf {{.BUILD_DIR}}
-        fi
-      - cmake -S . -B {{.BUILD_DIR}} -G Ninja
-    status:
-      - grep -q '^CMAKE_GENERATOR:INTERNAL=Ninja$' {{.BUILD_DIR}}/CMakeCache.txt
+      - cmake -S . -B {{.BUILD_DIR}} -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 
   build:
     desc: Build all targets
-    deps: [configure]
     cmds:
       - cmake --build {{.BUILD_DIR}}
 
   run:
     desc: Build then run the app
-    deps: [build]
     cmds:
       - "{{.BUILD_DIR}}/app/app"
 
