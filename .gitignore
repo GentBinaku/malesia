@@ -5,6 +5,7 @@ out/
 
 # vcpkg
 vcpkg_installed/
+tools/
 compile_commands.json
 
 # JetBrains (CLion/Rider)

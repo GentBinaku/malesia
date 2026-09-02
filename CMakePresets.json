@@ -1,4 +1,3 @@
-
 {
   "version": 8,
   "configurePresets": [
@@ -8,8 +7,9 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "g++-16",
-        "CMAKE_TOOLCHAIN_FILE": "/home/gent-binaku/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_CXX_COMPILER": "g++",
+        "VCPKG_INSTALL_OPTIONS": "--clean-after-build",
+        "CMAKE_TOOLCHAIN_FILE": "tools/vcpkg/scripts/buildsystems/vcpkg.cmake"
       }
     }
   ]
