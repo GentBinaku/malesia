@@ -1,0 +1,16 @@
+
+{
+  "version": 8,
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "g++-16",
+        "CMAKE_TOOLCHAIN_FILE": "/home/gent-binaku/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      }
+    }
+  ]
+}

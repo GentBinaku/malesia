@@ -1,55 +1,128 @@
 // clang-format off
 #include <cmath>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <cstdio>
+#include <numbers>
+#include <string>
+#include <string_view>
 #include <vector>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <malesia/window.hpp>
+#include <malesia/render.hpp>
+#include <imgui.h>
 // clang-format on
 
-import malesia.window;
-import malesia.render;
+namespace {
 
-auto mainLoop(malesia::window::Window &window, malesia::render::Scene &scene)
-    -> void {
-  while (!window.shouldClose()) {
-    window.pollEvents();
+constexpr std::string_view kVertexShader = R"(#version 460 core
+layout(location = 0) in vec3 aPos;
+uniform mat4 uMvp;
+void main() {
+  gl_Position = uMvp * vec4(aPos, 1.0);
+  gl_PointSize = 2.0;
+}
+)";
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+constexpr std::string_view kFragmentShader = R"(#version 460 core
+out vec4 FragColor;
+uniform vec3 uColor;
+void main() { FragColor = vec4(uColor, 1.0); }
+)";
 
-    scene.draw();
-
-    window.swapBuffers();
+// Flat xyz point cloud on the unit sphere.
+auto makeSphere(int stacks, int slices) -> std::vector<float> {
+  std::vector<float> v;
+  v.insert(v.end(), {0.0f, 1.0f, 0.0f});
+  for (int i = 1; i < stacks; ++i) {
+    float phi = std::numbers::pi_v<float> * float(i) / float(stacks);
+    for (int j = 0; j < slices; ++j) {
+      float theta = 2.0f * std::numbers::pi_v<float> * float(j) / float(slices);
+      v.insert(v.end(), {std::sin(phi) * std::cos(theta), std::cos(phi),
+                         std::sin(phi) * std::sin(theta)});
+    }
   }
+  v.insert(v.end(), {0.0f, -1.0f, 0.0f});
+  return v;
 }
 
-auto main() -> int {
-  malesia::window::Window window(800, 600);
+// A game-side object. It does not draw itself - it satisfies Renderable by
+// handing back one RenderItem each frame.
+struct Spinner {
+  malesia::render::MeshHandle mesh;
+  malesia::render::ProgramHandle program;
+  glm::vec3 color;
+  glm::vec3 axis;
+  float angle;
 
-  window.setKeyCallback([&window](int key, int scancode, int action, int mods) {
+  auto extract() const -> malesia::render::RenderItem {
+    return {
+        .mesh = mesh,
+        .program = program,
+        .model = glm::rotate(glm::mat4(1.0f), angle, axis),
+        .color = color,
+        .path = malesia::render::RenderPath::Opaque,
+    };
+  }
+};
+
+} // namespace
+
+auto main() -> int {
+  malesia::window::Window window(1920, 1080);
+  window.setKeyCallback([&window](int key, int, int action, int) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
       glfwSetWindowShouldClose(window.handle(), GLFW_TRUE);
     }
   });
 
-  // Create sphere mesh
-  auto n_stacks = 100;
-  auto n_slices = 100;
-  std::vector<std::vector<float>> sphereMesh;
-  sphereMesh.push_back({0, 1, 0});
-  for (int i = 0; i < n_stacks - 1; i++) {
-    auto phi = M_PI * double(i + 1) / double(n_stacks);
-    for (int j = 0; j < n_slices; j++) {
-      auto theta = 2.0 * M_PI * double(j) / double(n_slices);
-      float x = std::sin(phi) * std::cos(theta);
-      float y = std::cos(phi);
-      float z = std::sin(phi) * std::sin(theta);
-      sphereMesh.push_back({x, y, z});
-    }
+  malesia::render::Renderer renderer(window);
+
+  auto sphereVerts = makeSphere(100, 100);
+  auto sphereMesh =
+      renderer.uploadMesh(sphereVerts, malesia::render::Renderer::Points{});
+  auto program = renderer.createProgram(std::string(kVertexShader),
+                                        std::string(kFragmentShader));
+  if (!program) {
+    std::fputs(program.error().c_str(), stderr);
+    return 1;
   }
-  sphereMesh.push_back({0, -1, 0});
+
+  Spinner sphere{
+      sphereMesh, *program, {0.4f, 0.8f, 1.0f}, {0.0f, 1.0f, 0.0f}, 0.0f};
+
+  glm::mat4 proj =
+      glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+  glm::mat4 view = glm::lookAt(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f),
+                               glm::vec3(0.0f, 1.0f, 0.0f));
+  glm::mat4 viewProj = proj * view;
 
   malesia::render::Scene scene;
 
-  mainLoop(window, scene);
+  bool showOverlay = false;
+  renderer.setDebugUi([&] {
+    if (!showOverlay)
+      return;
+    ImGui::SetNextWindowBgAlpha(0.35f);
+    if (ImGui::Begin("malesia", &showOverlay,
+                     ImGuiWindowFlags_AlwaysAutoResize |
+                         ImGuiWindowFlags_NoNav)) {
+      ImGui::Text("%.1f FPS  (%.2f ms)", ImGui::GetIO().Framerate,
+                  1000.0f / ImGui::GetIO().Framerate);
+      ImGui::Text("sphere angle: %.2f rad", sphere.angle);
+      ImGui::TextDisabled("scaffold: clear + overlay, no geometry yet");
+    }
+    ImGui::End();
+  });
+
+  while (!window.shouldClose()) {
+    window.pollEvents();
+
+    sphere.angle = float(glfwGetTime());
+
+    scene.clear();
+    scene.submit(sphere); // Renderable overload -> sphere.extract()
+    renderer.render(scene, viewProj);
+  }
+
   return 0;
 }

@@ -1,16 +1,17 @@
 version: '3'
 
 vars:
+  PRESET: default
   BUILD_DIR: build
 
 tasks:
   configure:
-    desc: Configure the CMake build (Ninja is required for C++ module support)
+    desc: Configure the CMake build using a configure preset
     cmds:
-      - cmake -S . -B {{.BUILD_DIR}} -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+      - cmake --preset {{.PRESET}}
 
   build:
-    desc: Build all targets
+    desc: Build all targets using a build preset
     cmds:
       - cmake --build {{.BUILD_DIR}}
 
@@ -23,4 +24,3 @@ tasks:
     desc: Remove the build directory
     cmds:
       - rm -rf {{.BUILD_DIR}}
-

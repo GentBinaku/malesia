@@ -3,12 +3,24 @@
     "glfw3",
     "glm",
     "stb",
-    "opengl-registry",
     "tinyobjloader",
+    "vulkan",
+    "vulkan-headers",
     {
-      "name": "glad",
+      "name": "vulkan-loader",
       "features": [
-        "gl-api-latest"
+        "xcb",
+        "xlib"
+      ]
+    },
+    "vk-bootstrap",
+    "vulkan-memory-allocator",
+    "shaderc",
+    {
+      "name": "imgui",
+      "features": [
+        "glfw-binding",
+        "vulkan-binding"
       ]
     }
   ]
